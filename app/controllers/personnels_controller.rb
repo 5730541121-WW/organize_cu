@@ -1,6 +1,6 @@
 class PersonnelsController < ApplicationController
 
-  before_action :set_personnel, only: [:show, :edit, :update, :destroy]
+  before_action :set_personnel, only: [:show, :edit, :update, :destroy, :save]
   before_action :logged_in_personnel
 
   # GET /personnels
@@ -18,10 +18,41 @@ class PersonnelsController < ApplicationController
   # GET /personnels/1
   # GET /personnels/1.json
   def show
+
+    #Get all student in advisors
+    @students = @personnel.students;
+
+    #Get department
+    @workin = if @personnel.workin.nil? then "" else @personnel.workin.name end
+    @manage = if @personnel.manage.nil? then "" else @personnel.manage.name end
+
 		respond_to do |format|
 			format.html { render :show }
 			format.json { render json: Oj.dump(@personnel) }
 		end
+  end
+
+  def save
+
+    #Get all student in advisors
+    @students = @personnel.students;
+
+    #Get department
+    @workin = if @personnel.workin.nil? then "" else @personnel.workin.name end
+    @manage = if @personnel.manage.nil? then "" else @personnel.manage.name end
+
+    render  pdf: 'filename.pdf',
+            template: 'personnels/show.pdf.erb',
+            page_size: 'A4',
+            margin: {
+              :top => 40
+            },
+            header:  {
+              spacing: 10,
+              html: {
+                template: 'layouts/header.pdf.erb',
+              },
+            }
   end
 
   # GET /personnels/new

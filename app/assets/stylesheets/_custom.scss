@@ -2,6 +2,38 @@ tr {
     page-break-inside: avoid;
 }
 
+table.highlight tbody tr:hover {
+    background-color: #fffde7 !important;
+}
+table.striped tbody {
+    background-color: #ffffff !important;
+}
+table.striped > tbody > tr:nth-child(odd){
+    background-color: #fffde7 !important;
+}
+
+/*
+When creating your CSS selector,
+change "brown" to something of your choosing
+*/
+.waves-effect.waves-pink .waves-ripple {
+ /* The alpha value allows the text and background color
+ of the button to still show through. */
+  background-color: #f06292;
+}
+
+ul.side-nav.fixed li.active {
+    background-color: #f06292;
+    a {
+      color: white;
+    }
+}
+
+.side-nav .userView {
+  margin-bottom: 0px;
+}
+
+
 .pagination {
   li {
     display: inline-block;
@@ -40,10 +72,19 @@ tr {
 	margin-bottom: 0px;
 }
 
-.dropdown-content li > a, .dropdown-content li > span {
-	color: black;
-}
 
 .border-space {
 	padding: 20px 30px 20px 30px;
+}
+
+
+@media only screen and (max-width: 992px) {
+  nav .nav-wrapper {
+      text-align: center;
+  }
+}
+
+nav .nav-wrapper {
+    position: relative;
+    height: 100%;
 }

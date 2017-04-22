@@ -2,15 +2,23 @@ class Personnel < ApplicationRecord
   attr_accessor :remember_token
 
   before_save :downcase_email
-  
-  has_many :microposts
+
+  has_many :advisors
+  has_many :students, :through => :advisors
+
+  has_many :sections
+  has_many :courses, :through => :sections
+
+  belongs_to :workin, class_name: 'Department', foreign_key: 'workin_department_id'
+  belongs_to :manage, class_name: 'Department', foreign_key: 'manage_department_id'
+
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :email, presence: true, length: {maximum: 255},
                     format: { with: VALID_EMAIL_REGEX },
                     uniqueness: { case_sensitive: false }
 
   has_secure_password
-  validates :password, presence: true, length: { minimum: 6 }, allow_nil: true       
+  validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
 
 
   class << self
@@ -43,12 +51,11 @@ class Personnel < ApplicationRecord
   def forget
     update_attribute(:remember_digest, nil)
   end
-    
+
   private
     # converts email to all lower-case
     def downcase_email
       self.email = email.downcase
     end
-    
-end
 
+end

@@ -13,7 +13,7 @@ class ViewindivController < ApplicationController
   	#puts Student.attribute_names
 
   	if !params[:searchinput][:id].nil? && !params[:searchinput][:id].blank?
-  		@search_result = @search_result.where(id: params[:searchinput][:id])
+  		@search_result = @search_result.where("id LIKE :prefix", prefix: "#{params[:searchinput][:id]}%")
   	end
 
   	if !params[:searchinput][:first_name].nil?  && !params[:searchinput][:first_name].blank?

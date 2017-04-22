@@ -1,20 +1,275 @@
-<% provide(:title, 'course') %>
+
+<div class="container">
+	<h5> <%= (@course.name || "") %> </h5>
+	<div class="card">
+	<div class="card-content">
+    	<div class="row">
+		    <div class="col s12">
+	    	 	<table class = "striped">
+		            <tbody>
+			            <tr>
+			            	<th>Credit</th>
+			                <td><%= @course.credit %></td>
+			            </tr>
+
+			            <tr>
+			            	<th>Code</th>
+			                <td><%= @course.code_id %></td>
+			            </tr>
+
+			            <tr>
+			            	<th>Department</th>
+			                <td><%= @code.first.dep_name %></td>
+			            </tr>
+
+			            <tr>
+			            	<th>Category</th>
+			                <td><%= @code.first.category %></td>
+			            </tr>
+		            </tbody>
+		  	    </table>
+	  	    </div>
+	    </div>
+    </div>
+    </div>
+</div>
+<br>
+<div class="container">
+	<div class="card">
+		<div class="card-content">
+			<div class="row">
+				<div class="col s6">
+					 	<canvas id="chartStudentCount" width="800" height="800"></canvas>
+				</div>
+				<div class="col s6">
+					 	<canvas id="chartGradeAverage" width="800" height="800"></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<br>
+<div class="container">
+	<div class="card">
+	<div class="card-content">
 
 
-<p>
-  <strong>Code:</strong>
-  <%= @course.code_id %>
-</p>
+			<div class="input-field col s12">
+			    <select id="selectYearSemester" >
+			    	<% @listYearSem.each do |cur| %>
+				      <option value="<%= cur.year.to_s + "-" + cur.semester.to_s %>" <%= if cur.year==@currentYearSem[:year] and cur.semester == @currentYearSem[:semester] then "selected" else "" end %>><%= cur.year.to_s + "-" + cur.semester.to_s %></option>
+				  	<% end %>
+			    </select>
+			    <label>Choose year and semester</label>
+			</div>
 
-<p>
-  <strong>Name:</strong>
-  <%= @course.name %>
-</p>
 
-<p>
-  <strong>Credit:</strong>
-  <%= @course.credit %>
-</p>
+		<div class="container">
 
-<%= link_to 'Edit', edit_course_path(@course) %> |
-<%= link_to 'Back', courses_path %>
+			
+
+			<div class="row">
+				<div class="col s9">
+					<canvas id="chartShowEachGrade" width="800" height="800"></canvas>
+				</div>
+				<div class="col s3">
+					<table class="highlight">
+				        <tbody>
+					        	<tr>
+					        		<th>Student</th>
+					            	<td><%= @current_student_count %></td>
+					            </tr>
+					            <tr>
+					        		<th>Section</th>
+					            	<td><%= @current_section_count %></td>
+					            </tr>
+					            <tr>
+					        		<th>Grade Average</th>
+					            	<td><%= @current_grade %></td>
+					            </tr>
+
+				        </tbody>
+				    </table>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="col s12">
+					<table class="highlight striped">
+					 	<thead>
+					 		<th>Year</th>
+					 		<th>Semester</th>
+					 		<th>Sec No.</th>
+					 		<th>Day</th>
+					 		<th>Time</th>
+					 	</thead>
+				        <tbody>
+					        <% @section_data_arr.each do |sec| %>
+					        	<tr>
+					            	<td><%= sec[0].year %></td>
+					            	<td><%= sec[0].semester %></td>
+					            	<td><%= sec[0].sec %></td>
+					            	<td><%= sec[1].day %></td>
+					            	<td><%= DateTime.parse(sec[1].start.to_s).localtime.strftime('%H:%M') + " - " + DateTime.parse(sec[1].end.to_s).localtime.strftime('%H:%M') %></td>
+					          	</tr>
+					        <% end %>
+				        </tbody>
+				    </table>
+			    </div>
+			 </div>
+		</div>
+	</div>
+	</div>
+</div>
+<script>
+	$(document).ready(function() {
+	    $('select').material_select();
+	});
+	$(".dropdown-button").dropdown();
+
+	$(document).ready(function(){
+    	$('.collapsible').collapsible();
+	});
+	$('select').on('change', function() {
+	  var choose = this.value.split('-');
+
+	  window.location = '/courses/<%= @course.id %>?year=' + choose[0] + '&semester=' + choose[1];
+	})
+
+
+	$(function() {
+		var ctx = $("#chartStudentCount");
+		var myChart = new Chart(ctx, {
+		    type: 'bar',
+		    data: {
+		        labels: [
+		       			<% @StudentYearSem.each do |std| %>
+					      <%= raw "\"" + std.year.to_s + " / " + std.semester.to_s + "\"," %>
+					    <% end %>
+		        	],
+		        datasets: [{
+		            label: 'Number of Students',
+		            data: [
+		            	<% @StudentYearSem.each do |std| %>
+					      <%= std.num.to_s + "," %>
+					    <% end %>
+		            ],
+		            backgroundColor: [
+		            	<% stdCount = 0 %>
+		            	<% @StudentYearSem.each do |std| %>
+		            	  <%= raw "\"" + @colorList[stdCount % @colorList.length] + "\"," %>
+		            	  <% #puts "\"" + @colorList[stdCount % @colorList.length] + "\"," %>
+					      <% stdCount = stdCount + 1 %>
+					    <% end %>
+		            ],
+		            borderColor: [
+		            	<% stdCount = 0 %>
+		            	<% @StudentYearSem.each do |std| %>
+		            	  <%= raw "\"" + @colorList[stdCount % @colorList.length] + "\"," %>
+					      <% stdCount = stdCount + 1 %>
+					    <% end %>
+		            ],
+		            borderWidth: 1,
+		        }]
+		    },
+		    options: {
+		        scales: {
+		            yAxes: [{
+		                ticks: {
+		                    beginAtZero:true
+		                }
+		            }]
+		        }
+		    }
+		});
+	});
+
+	$(function() {
+		var ctx = $("#chartGradeAverage");
+		var myChart = new Chart(ctx, {
+		    type: 'line',
+		    data: {
+		        labels: [
+		       			<% @gradeAverage.each do |std| %>
+					      <%= raw "\"" + std.year.to_s + " / " + std.semester.to_s + "\"," %>
+					    <% end %>
+		        	],
+		        datasets: [{
+		            label: 'Grade Average',
+		            data: [
+		            	<% @gradeAverage.each do |std| %>
+					      <%= sprintf("%.2f,",std.num) %>
+					    <% end %>
+		            ],
+		            fill: false,
+		            lineTension: 0.5,
+		            backgroundColor: "#ff9800",
+		            borderColor: "#ff9800",
+		            borderCapStyle: 'round',
+		            borderDash: [],
+		            borderDashOffset: 0.0,
+		            borderJoinStyle: 'round',
+		            pointBorderColor: "#e65100",
+		            pointBackgroundColor: "#e65100",
+		            pointBorderWidth: 0.01,
+		            pointHoverRadius: 10,
+		            pointHoverBackgroundColor: "#e65100",
+		            pointHoverBorderColor: "#e65100",
+		            pointHoverBorderWidth: 2,
+		            pointRadius: 4,
+		            pointHitRadius: 10,
+		            spanGaps: false,
+		        }]
+		    },
+		    options: {
+		        scales: {
+		            yAxes: [{
+		                ticks: {
+		                    beginAtZero:true
+		                }
+		            }]
+		        }
+		    }
+		});
+	});
+
+	$(function() {
+		var ctx = $("#chartShowEachGrade");
+		var myChart = new Chart(ctx, {
+		    type: 'pie',
+		    data: {
+		        labels: [
+		        	<% @gradeList.each do |grade| %>
+ 						<%= raw "\"" + @gradeAlphabet[grade.grade] + "\"," if !@gradeAlphabet[grade.grade].nil? %>
+					<% end %>
+		        ],
+			    datasets: [
+			        {
+			            data: [
+				            <% @gradeList.each do |grade| %>
+	     						<%= grade.num.to_s + "," if !@gradeAlphabet[grade.grade].nil?%>
+	    					<% end %>
+    					],
+    					backgroundColor: [
+        		        	<% @gradeList.each do |grade| %>
+		 						<%= raw "\"#" + @gradeColor[grade.grade].upcase + "\"," if !@gradeAlphabet[grade.grade].nil? %>
+							<% end %>
+				        ]
+			        }
+			    ]
+		    },
+		    options: {
+		        elements: {
+		            points: {
+		                borderWidth: 1,
+		                borderColor: 'rgb(0, 0, 0)'
+		            }
+		        }
+		    }
+		});
+	});
+
+
+
+</script>

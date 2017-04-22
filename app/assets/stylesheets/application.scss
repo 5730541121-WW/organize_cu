@@ -8,15 +8,24 @@
 // @import "materialize/components/prefixer";
 @import "materialize/components/mixins";
 @import "materialize/components/color";
-$primary-color: color("blue", "lighten-2") !default;
-// $secondary-color: color("yellow", "base") !default;
+$primary-color: color("pink", "lighten-2") !default;
+$primary-color-light: false !default;
+$primary-color-dark: false !default;
+@if not $primary-color-light {
+  $primary-color-light: lighten($primary-color, 15%);
+}
+@if not $primary-color-dark {
+  $primary-color-dark: darken($primary-color, 15%);
+}
+$secondary-color: color("pink", "lighten-2") !default;
+$success-color: color("pink", "lighten-2") !default;
+$error-color: color("pink", "lighten-2") !default;
+
+$link-color: color("pink", "lighten-2") !default;
+
 
 // Variables;
 @import "materialize/components/variables";
-
-// Reset
-@import "materialize/components/normalize";
-
 
 /** clockpicker */
 // Variables;
@@ -25,40 +34,6 @@ $primary-color: color("blue", "lighten-2") !default;
 //primary
 @import "components/primary";
 
-//dark
-@import "components/dark";
-
-// materialize/components
-@import "materialize/components/global";
-@import "materialize/components/badges";
-@import "materialize/components/icons-material-design";
-@import "materialize/components/grid";
-@import "materialize/components/navbar";
-@import "materialize/components/roboto";
-@import "materialize/components/typography";
-@import "materialize/components/transitions";
-@import "materialize/components/cards";
-@import "materialize/components/toast";
-@import "materialize/components/tabs";
-@import "materialize/components/tooltip";
-@import "materialize/components/buttons";
-@import "materialize/components/dropdown";
-@import "materialize/components/waves";
-@import "materialize/components/modal";
-@import "materialize/components/collapsible";
-@import "materialize/components/chips";
-@import "materialize/components/materialbox";
-@import "materialize/components/forms/forms";
-@import "materialize/components/table_of_contents";
-@import "materialize/components/sideNav";
-@import "materialize/components/preloader";
-@import "materialize/components/slider";
-@import "materialize/components/carousel";
-@import "materialize/components/tapTarget";
-@import "materialize/components/pulse";
-@import "materialize/components/date_picker/default";
-@import "materialize/components/date_picker/default.date";
-@import "materialize/components/date_picker/default.time";
 
 @import "materialize/extras/nouislider";
 

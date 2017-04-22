@@ -17,7 +17,7 @@ class TimeSlotsController < ApplicationController
   # GET /time_slots/1.json
   def show
     respond_to do |format|
-      format.html { render :index }
+      format.html { render :show }
       format.json { render json: Oj.dump(@time_slot) }
     end
   end

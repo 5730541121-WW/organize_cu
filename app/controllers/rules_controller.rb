@@ -17,7 +17,7 @@ class RulesController < ApplicationController
   # GET /rules/1.json
   def show
 		respond_to do |format|
-			format.html { render :index }
+			format.html { render :show }
 			format.json { render json: Oj.dump(@rule) }
 		end
   end

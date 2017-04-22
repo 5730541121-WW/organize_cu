@@ -12,6 +12,7 @@
 
 <script>
   $(function() {
+		if ($('#list_wrapper').length == 0) {
       $('#list').DataTable({
 				"pageLength": 15,
 				"bLengthChange": false,
@@ -45,5 +46,6 @@
 						}
         ]
 			});
+		}
   });
 </script>

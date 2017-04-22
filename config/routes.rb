@@ -39,4 +39,5 @@ Rails.application.routes.draw do
   post '/searchindiv', to: 'viewindiv#search'
 
   post '/student_pdf', to: 'students#save'
+  post '/personnel_pdf', to: 'personnels#save'
 end

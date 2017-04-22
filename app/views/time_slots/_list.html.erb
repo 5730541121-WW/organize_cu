@@ -13,9 +13,11 @@
 
 <script>
   $(function() {
+		if ($('#list_wrapper').length == 0) {
       $('#list').DataTable({
 				"pageLength": 15,
 				"bLengthChange": false,
+				"destroy": true,
         "ajax": {
 					"url": "/time_slots.json",
 					"dataSrc": ""
@@ -27,12 +29,12 @@
 						{ "data": "start",
 							"render": function(data) {
 								return moment.utc(data).format('HH:mm');
-							} 
+							}
 						},
 						{ "data": "end",
 							"render": function(data) {
 								return moment.utc(data).format('HH:mm');
-							} 
+							}
 						},
 						{
 							"orderable": false,
@@ -44,5 +46,6 @@
 						}
         ]
 			});
+		}
   });
 </script>

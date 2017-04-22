@@ -1,5 +1,5 @@
 class StudentsController < ApplicationController
-  before_action :set_student, only: [:show, :edit, :update, :destroy]
+  before_action :set_student, only: [:show, :edit, :update, :destroy, :save]
   before_action :logged_in_personnel
 
   # GET /students
@@ -12,22 +12,40 @@ class StudentsController < ApplicationController
 		end
   end
 
+
+
   # GET /students/1
   # GET /students/1.json
   def show
+    @colorList = [
+        '#f44336',
+        '#ff5722',
+        '#ff9800',
+        '#ffc107',
+        '#ffeb3b',
+        '#cddc39',
+        '#8bc34a',
+        '#4caf50',
+        '#009688',
+        '#00bcd4',
+        '#03a9f4',
+        '#2196f3']
 
-
-    #Get student
-    @student = Student.find(params[:id])
+    @advisor_name_arr = Array.new
+    @advisor = Advisor.where(student_id: @student.id)
+    @advisor.each do |adv|
+      x = Personnel.find_by(id: adv.personnel_id)
+      @advisor_name_arr.push(x)
+    end
 
     #Academic Info
-    @gpa = Gpa.where(student_id:@student.id)
+    @gpa = Gpa.where(student_id:@student.id).order(year: :desc, semester: :desc)
     @gpax = Gpa.find_by_sql("SELECT SUM(credit*gpa)/SUM(credit) as gpax FROM gpas WHERE student_id = \'"+params[:id]+"\'")
 
     #Group Info
     @in_group = BelongTo.where(student_id: @student.id)
 
-    #Leave Info    
+    #Leave Info
     @personal_leave_arr = Array.new
     @sick_leave_arr = Array.new
 
@@ -36,9 +54,9 @@ class StudentsController < ApplicationController
       @leave.each do |leave|
         personal_leave = PersonalLeave.where(leave_id:leave.id).first
         sick_leave = SickLeave.where(leave_id:leave.id).first
-        if !personal_leave.nil?   
-          @personal_leave_arr.push([leave, personal_leave]) 
-        else 
+        if !personal_leave.nil?
+          @personal_leave_arr.push([leave, personal_leave])
+        else
           @sick_leave_arr.push([leave, sick_leave])
         end
       end
@@ -53,9 +71,9 @@ class StudentsController < ApplicationController
       @portfolio.each do |port|
         competition_portfolio = Competition.where(portfolio_id:port.id).first
         activity_portfolio = Activity.where(portfolio_id:port.id).first
-        if !competition_portfolio.nil?   
-          @competition_portfolio_arr.push([port, competition_portfolio]) 
-        else 
+        if !competition_portfolio.nil?
+          @competition_portfolio_arr.push([port, competition_portfolio])
+        else
           @activity_portfolio_arr.push([port, activity_portfolio])
         end
       end
@@ -69,17 +87,26 @@ class StudentsController < ApplicationController
       @breaking_arr.push([_break, rule])
     end
 
+    #Curriculum
+    @required_subject = Require.where(curriculum_id: @student.curriculum_id).order(:course_id)
+    @required_subject_arr = Array.new
+    @required_subject.each do |subject|
+      subject_detail = Course.find_by(id: subject.course_id)
+      @required_subject_arr.push([subject, subject_detail])
+    end
+
+    @enrolled_course = Enrollment.joins("INNER JOIN sections ON enrollments.section_id = sections.id").select("sections.course_id, enrollments.grade, enrollments.student_id").order("sections.course_id")
 
     respond_to do |format|
       format.html { render :show }
       format.json { render json: Oj.dump(@student) }
     end
+
+
   end
 
   def save
 
-      #Get student
-    @student = Student.find('5731002421')
 
     #Academic Info
     @gpa = Gpa.where(student_id:@student.id)
@@ -88,43 +115,37 @@ class StudentsController < ApplicationController
     #Group Info
     @in_group = BelongTo.where(student_id: @student.id)
 
-    puts "NO. OF GROUP: " + @in_group.count.to_s
-
-    #Leave Info    
+    #Leave Info
     @personal_leave_arr = Array.new
     @sick_leave_arr = Array.new
 
     @in_group.each do |group|
       @leave = Leave.where(group_id: group.id).order(start_date: :desc)
-      puts "NO. OF LEAVING: " + @leave.count.to_s
+
       @leave.each do |leave|
         personal_leave = PersonalLeave.where(leave_id:leave.id).first
         sick_leave = SickLeave.where(leave_id:leave.id).first
-        puts "LEAVING TYPE: "
-        puts personal_leave
-        puts sick_leave
-        puts "END LEAVING TYPE"
-        if !personal_leave.nil?   
-          @personal_leave_arr.push([leave, personal_leave]) 
-        else 
+
+        if !personal_leave.nil?
+          @personal_leave_arr.push([leave, personal_leave])
+        else
           @sick_leave_arr.push([leave, sick_leave])
         end
       end
     end
 
-      pdf = WickedPdf.new.pdf_from_string(
-                    render_to_string(
-                      template: 'students/show.pdf.erb',
-                      layout: 'layouts/application.pdf.erb',
-                      :page_size => 'A4',
-                      :show_as_html => true,
-                      :disable_smart_shrinking => false,
-                      javascript_delay: 1000
-                      ))
-      send_data(pdf,
-                filename: 'file_name.pdf',
-                type: 'application/pdf',
-                disposition: 'attachment')
+    render  pdf: 'filename.pdf',
+            template: 'students/show.pdf.erb',
+            page_size: 'A4',
+            margin: {
+              :top => 40
+            },
+            header:  {
+              spacing: 10,
+              html: {
+                template: 'layouts/header.pdf.erb',
+              },
+            }
   end
 
   # GET /students/new
